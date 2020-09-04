@@ -125,7 +125,7 @@ Try {
 		Show-InstallationProgress
 
 		## <Perform Pre-Installation tasks here>
-		Copy-File -Path "$dirSupportFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse
+		Copy-File -Path "$dirSupportFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
 
 		##*===============================================
 		##* INSTALLATION
