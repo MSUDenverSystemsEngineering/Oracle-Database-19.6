@@ -125,7 +125,6 @@ Try {
 		Show-InstallationProgress
 
 		## <Perform Pre-Installation tasks here>
-		Copy-Item -Path "$dirSupportFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
 
 		##*===============================================
 		##* INSTALLATION
@@ -139,8 +138,8 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
+		Copy-Item -Path "$dirSupportFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
 		Execute-Process -Path "$envSystemDrive\ORACLE19_6\instantclient_19_6\odbc_install.exe" -WindowStyle "Hidden"
-
 
 		##*===============================================
 		##* POST-INSTALLATION
