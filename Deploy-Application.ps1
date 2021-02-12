@@ -70,8 +70,8 @@ Try {
 	[string]$appLang = 'EN'
 	[string]$appRevision = '01'
 	[string]$appScriptVersion = '3.8.0.0'
-	[string]$appScriptDate = '02/25/2020'
-	[string]$appScriptAuthor = 'James Hardy'
+	[string]$appScriptDate = '02/12/2021'
+	[string]$appScriptAuthor = 'Steve Patterson'
 	##*===============================================
 	## Variables: Install Titles (Only set here to override defaults set by the toolkit)
 	[string]$installName = ''
@@ -125,7 +125,7 @@ Try {
 		Show-InstallationProgress
 
 		## <Perform Pre-Installation tasks here>
-		Copy-Item -Path "$dirSupportFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
+
 
 		##*===============================================
 		##* INSTALLATION
@@ -139,7 +139,8 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
-		Execute-Process -Path "$envSystemDrive\ORACLE19_6\instantclient_19_6\odbc_install.exe" -WindowStyle "Hidden"
+		Copy-Item -Path "$dirFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
+		Execute-Process -Path "$envSystemDrive\ORACLE19_6\odbc_install.exe" -WindowStyle "Hidden"
 
 
 		##*===============================================
@@ -148,10 +149,9 @@ Try {
 		[string]$installPhase = 'Post-Installation'
 
 		## <Perform Post-Installation tasks here>
-		Execute-Process -Path "reg.exe" -Parameters "import `"${dirSupportFiles}\ODBC.reg`"" -PassThru
 
-		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in instantclient_19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod")
-		Add-OdbcDsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in instantclient_19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test")
+		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod (19.6)")
+		Add-OdbcDsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test (19.6)")
 
 		## Display a message at the end of the install
 		If (-not $useDefaultMsi) {
@@ -187,6 +187,14 @@ Try {
 
 		# <Perform Uninstallation tasks here>
 
+		# Removes Driver
+		Execute-Process -Path "$envSystemDrive\ORACLE19_6\odbc_uninstall.exe" -WindowStyle "Hidden"
+		# Cleans up Folder
+		Remove-Item "$envSystemDrive\ORACLE19_6" -Recurse
+
+		# Removes DSNs
+		remove-odbcdsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
+		remove-odbcdsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
 
 		##*===============================================
 		##* POST-UNINSTALLATION
@@ -212,3 +220,88 @@ Catch {
 	Show-DialogBox -Text $mainErrorMessage -Icon 'Stop'
 	Exit-Script -ExitCode $mainExitCode
 }
+
+
+
+
+
+# SIG # Begin signature block
+# MIIOjgYJKoZIhvcNAQcCoIIOfzCCDnsCAQExDzANBglghkgBZQMEAgEFADB5Bgor
+# BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCq9xmFA2v0dHZ3
+# 8Ga/UO6N/jmY7G46MQ6XvEZ68XzzO6CCC6EwggWuMIIElqADAgECAhAHA3HRD3la
+# QHGZK5QHYpviMA0GCSqGSIb3DQEBCwUAMHwxCzAJBgNVBAYTAlVTMQswCQYDVQQI
+# EwJNSTESMBAGA1UEBxMJQW5uIEFyYm9yMRIwEAYDVQQKEwlJbnRlcm5ldDIxETAP
+# BgNVBAsTCEluQ29tbW9uMSUwIwYDVQQDExxJbkNvbW1vbiBSU0EgQ29kZSBTaWdu
+# aW5nIENBMB4XDTE4MDYyMTAwMDAwMFoXDTIxMDYyMDIzNTk1OVowgbkxCzAJBgNV
+# BAYTAlVTMQ4wDAYDVQQRDAU4MDIwNDELMAkGA1UECAwCQ08xDzANBgNVBAcMBkRl
+# bnZlcjEYMBYGA1UECQwPMTIwMSA1dGggU3RyZWV0MTAwLgYDVQQKDCdNZXRyb3Bv
+# bGl0YW4gU3RhdGUgVW5pdmVyc2l0eSBvZiBEZW52ZXIxMDAuBgNVBAMMJ01ldHJv
+# cG9saXRhbiBTdGF0ZSBVbml2ZXJzaXR5IG9mIERlbnZlcjCCASIwDQYJKoZIhvcN
+# AQEBBQADggEPADCCAQoCggEBAMtXiSjEDjYNBIYXsPnFGHwZqvS5lgRNSaQjsyxg
+# LsGI6yLLDCpaYy3CBwN1on4QnYzEQpsHV+TJ/3K61ZvqAxhR6Anw8TjVjaB3kPdt
+# KJjEUlgiXNK0nDRyMVasZyeXALR5STSf1SxoMt8HIDd0KTB8yhME6ezFdFzwB5He
+# 2/jyOswfYsN+n4k2Q9UcaVtWgCzWua39anwNva7M4GugPO5ZkF6XkrGzRHpXctV/
+# Fk6LmqPY6sRm45nScnC1KQ3NN/t6ZBHzmAtgbZa41o5+AvNdkv9TVF6S3ODGpf3q
+# KW8kjFt82LLYdZi0V07ln+S/BtAlGUPOvqem4EkbMtZ5M3MCAwEAAaOCAewwggHo
+# MB8GA1UdIwQYMBaAFK41Ixf//wY9nFDgjCRlMx5wEIiiMB0GA1UdDgQWBBSl6Yhu
+# vPlIpfXzOIq+Y/mkDGObDzAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAT
+# BgNVHSUEDDAKBggrBgEFBQcDAzARBglghkgBhvhCAQEEBAMCBBAwZgYDVR0gBF8w
+# XTBbBgwrBgEEAa4jAQQDAgEwSzBJBggrBgEFBQcCARY9aHR0cHM6Ly93d3cuaW5j
+# b21tb24ub3JnL2NlcnQvcmVwb3NpdG9yeS9jcHNfY29kZV9zaWduaW5nLnBkZjBJ
+# BgNVHR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmluY29tbW9uLXJzYS5vcmcvSW5D
+# b21tb25SU0FDb2RlU2lnbmluZ0NBLmNybDB+BggrBgEFBQcBAQRyMHAwRAYIKwYB
+# BQUHMAKGOGh0dHA6Ly9jcnQuaW5jb21tb24tcnNhLm9yZy9JbkNvbW1vblJTQUNv
+# ZGVTaWduaW5nQ0EuY3J0MCgGCCsGAQUFBzABhhxodHRwOi8vb2NzcC5pbmNvbW1v
+# bi1yc2Eub3JnMC0GA1UdEQQmMCSBIml0c3N5c3RlbWVuZ2luZWVyaW5nQG1zdWRl
+# bnZlci5lZHUwDQYJKoZIhvcNAQELBQADggEBAIc2PVq7BamWAujyCQPHsGCDbM3i
+# 1OY5nruA/fOtbJ6mJvT9UJY4+61grcHLzV7op1y0nRhV459TrKfHKO42uRyZpdnH
+# aOoC080cfg/0EwFJRy3bYB0vkVP8TeUkvUhbtcPVofI1P/wh9ZT2iYVCerOOAqiv
+# xWqh8Dt+8oSbjSGhPFWyu04b8UczbK/97uXdgK0zNcXDJUjMKr6CbevfLQLfQiFP
+# izaej+2fvR/jZHAvxO9W2rhd6Nw6gFs2q3P4CFK0+yAkFCLk+9wsp+RsRvRkvdWJ
+# p+anNvAKOyVfCj6sz5dQPAIYIyLhy9ze3taVKm99DQQZV/wN/ATPDftLGm0wggXr
+# MIID06ADAgECAhBl4eLj1d5QRYXzJiSABeLUMA0GCSqGSIb3DQEBDQUAMIGIMQsw
+# CQYDVQQGEwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5
+# IENpdHkxHjAcBgNVBAoTFVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMl
+# VVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0xNDA5MTkw
+# MDAwMDBaFw0yNDA5MTgyMzU5NTlaMHwxCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJN
+# STESMBAGA1UEBxMJQW5uIEFyYm9yMRIwEAYDVQQKEwlJbnRlcm5ldDIxETAPBgNV
+# BAsTCEluQ29tbW9uMSUwIwYDVQQDExxJbkNvbW1vbiBSU0EgQ29kZSBTaWduaW5n
+# IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwKAvix56u2p1rPg+
+# 3KO6OSLK86N25L99MCfmutOYMlYjXAaGlw2A6O2igTXrC/Zefqk+aHP9ndRnec6q
+# 6mi3GdscdjpZh11emcehsriphHMMzKuHRhxqx+85Jb6n3dosNXA2HSIuIDvd4xwO
+# PzSf5X3+VYBbBnyCV4RV8zj78gw2qblessWBRyN9EoGgwAEoPgP5OJejrQLyAmj9
+# 1QGr9dVRTVDTFyJG5XMY4DrkN3dRyJ59UopPgNwmucBMyvxR+hAJEXpXKnPE4CEq
+# bMJUvRw+g/hbqSzx+tt4z9mJmm2j/w2nP35MViPWCb7hpR2LB8W/499Yqu+kr4LL
+# BfgKCQIDAQABo4IBWjCCAVYwHwYDVR0jBBgwFoAUU3m/WqorSs9UgOHYm8Cd8rID
+# ZsswHQYDVR0OBBYEFK41Ixf//wY9nFDgjCRlMx5wEIiiMA4GA1UdDwEB/wQEAwIB
+# hjASBgNVHRMBAf8ECDAGAQH/AgEAMBMGA1UdJQQMMAoGCCsGAQUFBwMDMBEGA1Ud
+# IAQKMAgwBgYEVR0gADBQBgNVHR8ESTBHMEWgQ6BBhj9odHRwOi8vY3JsLnVzZXJ0
+# cnVzdC5jb20vVVNFUlRydXN0UlNBQ2VydGlmaWNhdGlvbkF1dGhvcml0eS5jcmww
+# dgYIKwYBBQUHAQEEajBoMD8GCCsGAQUFBzAChjNodHRwOi8vY3J0LnVzZXJ0cnVz
+# dC5jb20vVVNFUlRydXN0UlNBQWRkVHJ1c3RDQS5jcnQwJQYIKwYBBQUHMAGGGWh0
+# dHA6Ly9vY3NwLnVzZXJ0cnVzdC5jb20wDQYJKoZIhvcNAQENBQADggIBAEYstn9q
+# TiVmvZxqpqrQnr0Prk41/PA4J8HHnQTJgjTbhuET98GWjTBEE9I17Xn3V1yTphJX
+# bat5l8EmZN/JXMvDNqJtkyOh26owAmvquMCF1pKiQWyuDDllxR9MECp6xF4wnH1M
+# cs4WeLOrQPy+C5kWE5gg/7K6c9G1VNwLkl/po9ORPljxKKeFhPg9+Ti3JzHIxW7L
+# dyljffccWiuNFR51/BJHAZIqUDw3LsrdYWzgg4x06tgMvOEf0nITelpFTxqVvMtJ
+# hnOfZbpdXZQ5o1TspxfTEVOQAsp05HUNCXyhznlVLr0JaNkM7edgk59zmdTbSGdM
+# q8Ztuu6VyrivOlMSPWmay5MjvwTzuNorbwBv0DL+7cyZBp7NYZou+DoGd1lFZN0j
+# U5IsQKgm3+00pnnJ67crdFwfz/8bq3MhTiKOWEb04FT3OZVp+jzvaChHWLQ8gbCO
+# RgClaZq1H3aqI7JeRkWEEEp6Tv4WAVsr/i7LoXU72gOb8CAzPFqwI4Excdrxp0I4
+# OXbECHlDqU4sTInqwlMwofmxeO4u94196qIqJQl+8Sykl06VktqMux84Iw3ZQLH0
+# 8J8LaJ+WDUycc4OjY61I7FGxCDkbSQf3npXeRFm0IBn8GiW+TRDk6J2XJFLWEtVZ
+# mhboFlBLoUlqHUCKu0QOhU/+AEOqnY98j2zRMYICQzCCAj8CAQEwgZAwfDELMAkG
+# A1UEBhMCVVMxCzAJBgNVBAgTAk1JMRIwEAYDVQQHEwlBbm4gQXJib3IxEjAQBgNV
+# BAoTCUludGVybmV0MjERMA8GA1UECxMISW5Db21tb24xJTAjBgNVBAMTHEluQ29t
+# bW9uIFJTQSBDb2RlIFNpZ25pbmcgQ0ECEAcDcdEPeVpAcZkrlAdim+IwDQYJYIZI
+# AWUDBAIBBQCggYQwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0B
+# CQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAv
+# BgkqhkiG9w0BCQQxIgQglh+6xV+Kb4X2kVTImglKKAQlum+GPUV9HI6yPx8ik5kw
+# DQYJKoZIhvcNAQEBBQAEggEAmSq6U8U2jTfc47qequkszIbc4lariySTfG0ogI85
+# +a0bb2vnK+0T8YVXAkzC5YPvYNl9pfCpHzVK5cADiOjy+OY745yutQI2UXA6ampr
+# oZsxMhZd2Z+N4IdB5o2aGcyEm8/CNdRhXCh0so5qgiX6kyg6L2hhfU9NgNz1IqPa
+# IeVUca3X1TTq5cb/i6mnc+jPe4VbJE9GuPaabGPoWWcbNcOfmxlMp1p5uJ4UHkaw
+# Ph42jCjyOOGhF6c8WTMQYpZR2cJ4e7csIZberv3vRkV2KLrmCBAIRl2bRwOPpcFx
+# 7oT3UDOHdA5GjGPRkSg0OnpfsjdzWdVNkD92aXR8GL/2Ng==
+# SIG # End signature block
