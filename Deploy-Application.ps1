@@ -37,12 +37,12 @@
 .LINK
 	http://psappdeploytoolkit.com
 #>
-[CmdletBinding()]
 ## Suppress PSScriptAnalyzer errors for not using declared variables during AppVeyor build
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "", Justification="Suppress AppVeyor errors on unused variables below")]
+[CmdletBinding()]
 Param (
 	[Parameter(Mandatory=$false)]
-	[ValidateSet('Install','Uninstall')]
+	[ValidateSet('Install','Uninstall','Repair')]
 	[string]$DeploymentType = 'Install',
 	[Parameter(Mandatory=$false)]
 	[ValidateSet('Interactive','Silent','NonInteractive')]
@@ -85,8 +85,8 @@ Try {
 
 	## Variables: Script
 	[string]$deployAppScriptFriendlyName = 'Deploy Application'
-	[version]$deployAppScriptVersion = [version]'3.8.0'
-	[string]$deployAppScriptDate = '23/09/2019'
+	[version]$deployAppScriptVersion = [version]'3.8.3'
+	[string]$deployAppScriptDate = '30/09/2020'
 	[hashtable]$deployAppScriptParameters = $psBoundParameters
 
 	## Variables: Environment
@@ -112,13 +112,13 @@ Try {
 	##* END VARIABLE DECLARATION
 	##*===============================================
 
-	If ($deploymentType -ine 'Uninstall') {
+	If ($deploymentType -ine 'Uninstall' -and $deploymentType -ine 'Repair') {
 		##*===============================================
 		##* PRE-INSTALLATION
 		##*===============================================
 		[string]$installPhase = 'Pre-Installation'
 
-		## Show Welcome Message, close Internet Explorer if needed, verify there is enough disk space to complete the install, and persist the prompt
+		## Show Welcome Message, close Internet Explorer if required, verify there is enough disk space to complete the install, and persist the prompt
 		Show-InstallationWelcome -CloseApps 'iexplore' -CheckDiskSpace -PersistPrompt
 
 		## Show Progress Message (with the default message)
@@ -205,7 +205,39 @@ Try {
 
 
 	}
+	ElseIf ($deploymentType -ieq 'Repair')
+	{
+		##*===============================================
+		##* PRE-REPAIR
+		##*===============================================
+		[string]$installPhase = 'Pre-Repair'
 
+		## Show Progress Message (with the default message)
+		Show-InstallationProgress
+
+		## <Perform Pre-Repair tasks here>
+
+		##*===============================================
+		##* REPAIR
+		##*===============================================
+		[string]$installPhase = 'Repair'
+
+		## Handle Zero-Config MSI Repairs
+		If ($useDefaultMsi) {
+			[hashtable]$ExecuteDefaultMSISplat =  @{ Action = 'Repair'; Path = $defaultMsiFile; }; If ($defaultMstFile) { $ExecuteDefaultMSISplat.Add('Transform', $defaultMstFile) }
+			Execute-MSI @ExecuteDefaultMSISplat
+		}
+		# <Perform Repair tasks here>
+
+		##*===============================================
+		##* POST-REPAIR
+		##*===============================================
+		[string]$installPhase = 'Post-Repair'
+
+		## <Perform Post-Repair tasks here>
+
+
+	}
 	##*===============================================
 	##* END SCRIPT BODY
 	##*===============================================
@@ -224,12 +256,11 @@ Catch {
 
 
 
-
 # SIG # Begin signature block
 # MIIOjgYJKoZIhvcNAQcCoIIOfzCCDnsCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCq9xmFA2v0dHZ3
-# 8Ga/UO6N/jmY7G46MQ6XvEZ68XzzO6CCC6EwggWuMIIElqADAgECAhAHA3HRD3la
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCnnydF412q7dXM
+# mhvajzA5jDphj2iiS9bZswdpNUGU7aCCC6EwggWuMIIElqADAgECAhAHA3HRD3la
 # QHGZK5QHYpviMA0GCSqGSIb3DQEBCwUAMHwxCzAJBgNVBAYTAlVTMQswCQYDVQQI
 # EwJNSTESMBAGA1UEBxMJQW5uIEFyYm9yMRIwEAYDVQQKEwlJbnRlcm5ldDIxETAP
 # BgNVBAsTCEluQ29tbW9uMSUwIwYDVQQDExxJbkNvbW1vbiBSU0EgQ29kZSBTaWdu
@@ -297,11 +328,11 @@ Catch {
 # bW9uIFJTQSBDb2RlIFNpZ25pbmcgQ0ECEAcDcdEPeVpAcZkrlAdim+IwDQYJYIZI
 # AWUDBAIBBQCggYQwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0B
 # CQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAv
-# BgkqhkiG9w0BCQQxIgQglh+6xV+Kb4X2kVTImglKKAQlum+GPUV9HI6yPx8ik5kw
-# DQYJKoZIhvcNAQEBBQAEggEAmSq6U8U2jTfc47qequkszIbc4lariySTfG0ogI85
-# +a0bb2vnK+0T8YVXAkzC5YPvYNl9pfCpHzVK5cADiOjy+OY745yutQI2UXA6ampr
-# oZsxMhZd2Z+N4IdB5o2aGcyEm8/CNdRhXCh0so5qgiX6kyg6L2hhfU9NgNz1IqPa
-# IeVUca3X1TTq5cb/i6mnc+jPe4VbJE9GuPaabGPoWWcbNcOfmxlMp1p5uJ4UHkaw
-# Ph42jCjyOOGhF6c8WTMQYpZR2cJ4e7csIZberv3vRkV2KLrmCBAIRl2bRwOPpcFx
-# 7oT3UDOHdA5GjGPRkSg0OnpfsjdzWdVNkD92aXR8GL/2Ng==
+# BgkqhkiG9w0BCQQxIgQgly5f9sPEw7+3XFpbtz93I9KsgIp4CvuMQC5bUmG+XDMw
+# DQYJKoZIhvcNAQEBBQAEggEAEBNcizVdR8SVnigcq4Y3CBJ1vt+UFml/J9Sd4WLs
+# jpzfAXeBB0RW5Ko7w8U+8lXnu/xy1lwVmoddSOAcpud9SBaOaIzbp3PVsMUQlFF8
+# bkWYeJAk94Kf7v8m5dk+4quI8fx35jLUhngb0GJUDK//awQtVA5YPA3yLh5IswN7
+# Ka9sByuvCWpBrcP3exUM3YoxSAfu8+0fEV980bPchLYrwSvAz2fjvDTkiZ93AiIo
+# RSJ7RGgo7rhh8ZmwPj7aFGiSMqbBH7cRJFI6x4/IOPK0IoFy6M7HhbgxnTrD3tTi
+# 6GKjZJNyIbKyocQlbZmRJjD7ih3FDZM9tKmDvvOvZFuNFw==
 # SIG # End signature block
