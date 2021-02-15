@@ -150,8 +150,8 @@ Try {
 
 		## <Perform Post-Installation tasks here>
 
-		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod (19.6)")
-		Add-OdbcDsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test (19.6)")
+		Add-OdbcDsn -Name "Prod_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod (19.6)")
+		Add-OdbcDsn -Name "Test_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test (19.6)")
 
 		## Display a message at the end of the install
 		If (-not $useDefaultMsi) {
@@ -193,8 +193,8 @@ Try {
 		Remove-Item "$envSystemDrive\ORACLE19_6" -Recurse
 
 		# Removes DSNs
-		remove-odbcdsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
-		remove-odbcdsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
+		remove-odbcdsn -Name "Test_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
+		remove-odbcdsn -Name "Prod_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
 
 		##*===============================================
 		##* POST-UNINSTALLATION
