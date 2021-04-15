@@ -150,7 +150,7 @@ Try {
 
 		## <Perform Post-Installation tasks here>
 
-		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod")
+		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod1")
 		Add-OdbcDsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test")
 
 		## Display a message at the end of the install
