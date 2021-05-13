@@ -195,6 +195,8 @@ Try {
 		# Removes DSNs
 		remove-odbcdsn -Name "Test_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
 		remove-odbcdsn -Name "Prod_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
+		remove-odbcdsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
+		remove-odbcdsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
 
 		##*===============================================
 		##* POST-UNINSTALLATION
