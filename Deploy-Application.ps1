@@ -140,7 +140,7 @@ Try {
 
 		## <Perform Installation tasks here>
 		Copy-Item -Path "$dirFiles\ORACLE19_6\*" -Destination "$envSystemDrive\ORACLE19_6" -Recurse -Force
-		Execute-Process -Path "$envSystemDrive\ORACLE19_6\odbc_install.exe" -WindowStyle "Hidden"
+		Execute-Process -Path "$envSystemDrive\ORACLE19_6\instantclient_19_6\odbc_install.exe" -WindowStyle "Hidden"
 
 
 		##*===============================================
@@ -189,7 +189,7 @@ Try {
 		# <Perform Uninstallation tasks here>
 
 		# Removes Driver
-		Execute-Process -Path "$envSystemDrive\ORACLE19_6\odbc_uninstall.exe" -WindowStyle "Hidden"
+		Execute-Process -Path "$envSystemDrive\ORACLE19_6\instantclient_19_6\odbc_uninstall.exe" -WindowStyle "Hidden"
 		# Cleans up Folder
 		Remove-Item "$envSystemDrive\ORACLE19_6" -Recurse
 
