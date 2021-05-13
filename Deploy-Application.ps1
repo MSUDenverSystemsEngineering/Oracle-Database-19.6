@@ -194,11 +194,10 @@ Try {
 		Remove-Item "$envSystemDrive\ORACLE19_6" -Recurse
 
 		# Removes DSNs
-		remove-odbcdsn -Name "Test_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
-		remove-odbcdsn -Name "Prod_19" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
-		remove-odbcdsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
-		remove-odbcdsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6"
-
+		remove-odbcdsn -Name "Test_19" -DsnType "System"
+		remove-odbcdsn -Name "Prod_19" -DsnType "System"
+		remove-odbcdsn -Name "Test" -DsnType "System"
+		remove-odbcdsn -Name "Prod" -DsnType "System"
 		##*===============================================
 		##* POST-UNINSTALLATION
 		##*===============================================
