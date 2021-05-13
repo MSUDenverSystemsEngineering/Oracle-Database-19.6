@@ -149,7 +149,8 @@ Try {
 		[string]$installPhase = 'Post-Installation'
 
 		## <Perform Post-Installation tasks here>
-
+		Remove-OdbcDsn -Name "Prod" -DsnType "System"
+		Remove-OdbcDsn -Name "Test" -DsnType "System"
 		Add-OdbcDsn -Name "Prod" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=PROD", "Description=Prod")
 		Add-OdbcDsn -Name "Test" -DsnType "System" -Platform "64-bit" -DriverName "Oracle in ORACLE19_6" -SetPropertyValue @("ServerName=TEST", "Description=Test")
 
