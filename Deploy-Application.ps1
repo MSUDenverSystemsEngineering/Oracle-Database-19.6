@@ -139,7 +139,7 @@ Try {
 		}
 
 		## <Perform Installation tasks here>
-		Execute-Process -Path "$envSystemDrive\ORACLE19_6\instantclient_19_6\odbc_install.exe" -WindowStyle "Hidden"
+		Execute-Process -Path "$envSystemDrive\ORACLE19_6\odbc_install.exe" -WindowStyle "Hidden"
 
 
 		##*===============================================
