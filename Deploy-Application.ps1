@@ -199,7 +199,16 @@ Try {
 		# Removes Driver
 		Execute-Process -Path "$installlocation\odbc_uninstall.exe" -WindowStyle "Hidden"
 		# Cleans up Folder
-		Remove-Item "$envSystemDrive\ORACLE19_6" -Recurse
+		# Sometimes there's a single dll file left in the Oracle folder that is in use by the WMI provider on uninstall.
+		# If this file isn't removed, a reinstall will put files into the wrong folder. To prevent this, this script cycles
+		# trying to delete the folder until the WMI lock expires. In testing this was sporadic, and when it occured, was around 2-3 minutes maxiumum.
+		Get-ChildItem -Path "$envSystemDrive\ORACLE19_6" -Recurse -force | Remove-Item -force -recurse
+		Remove-Item  "$envSystemDrive\ORACLE19_6" -Force -Recurse
+		While (Test-Path "$envSystemDrive\ORACLE19_6"){
+			Start-Sleep -s 15
+			Get-ChildItem -Path "$envSystemDrive\ORACLE19_6" -Recurse -force | Remove-Item -force -recurse
+			Remove-Item  "$envSystemDrive\ORACLE19_6" -Force -Recurse
+		}
 
 		# Removes DSNs
 		remove-odbcdsn -Name "Test_19" -DsnType "System"
@@ -265,11 +274,14 @@ Catch {
 
 
 
+
+
+
 # SIG # Begin signature block
 # MIIOjgYJKoZIhvcNAQcCoIIOfzCCDnsCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBeykNwTCTVhpHk
-# ZgiWxN0qpHUiF7hVDme7eVC538CRbaCCC6EwggWuMIIElqADAgECAhAHA3HRD3la
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAqb8JdKYa+TKJY
+# wMZxBsCFGG94HfnPm+ErSD43G+O0dKCCC6EwggWuMIIElqADAgECAhAHA3HRD3la
 # QHGZK5QHYpviMA0GCSqGSIb3DQEBCwUAMHwxCzAJBgNVBAYTAlVTMQswCQYDVQQI
 # EwJNSTESMBAGA1UEBxMJQW5uIEFyYm9yMRIwEAYDVQQKEwlJbnRlcm5ldDIxETAP
 # BgNVBAsTCEluQ29tbW9uMSUwIwYDVQQDExxJbkNvbW1vbiBSU0EgQ29kZSBTaWdu
@@ -337,11 +349,11 @@ Catch {
 # bW9uIFJTQSBDb2RlIFNpZ25pbmcgQ0ECEAcDcdEPeVpAcZkrlAdim+IwDQYJYIZI
 # AWUDBAIBBQCggYQwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkqhkiG9w0B
 # CQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGCNwIBFTAv
-# BgkqhkiG9w0BCQQxIgQg6WAA2bNKWEpElVmjovVOR0BvSMQvgw6RPt7+TyNO8vMw
-# DQYJKoZIhvcNAQEBBQAEggEAYe19wNkvk4uzL5qEyJo/HI8Wpeqi81Qs/QTLdAys
-# +T/ISGdKW6K/RSHMXWBP3sbjqf9micvhSVpdF5gPasvXEuNOeloJ5BDYvumJSA3h
-# TRyW/5bA2LpKDpEksAc0FqC5aQkBqekcdYNLiBQwpqGVbx6mbTsnJSyx0I3YwmIU
-# 0Kxw6pNbF8ysmf46plU+NttO5Ae6xqsgXcmhqbJjllBaCmRK0WdSgoB3R27p54/q
-# EzDYxCeyuNH6Fz3g8MGv+PTe5B40tOJ1MVeC823kyYOO/Jfkvz+/uvNWKhrQHlRg
-# qmUHb19ddUsZn+FQk8xZb98gZcspZl+WkIUdaL2snbH45A==
+# BgkqhkiG9w0BCQQxIgQg4jdkqCQNnTd2lV1TSohSc9kGl2mpBkLfiHnWklK+Zyww
+# DQYJKoZIhvcNAQEBBQAEggEAHxs9nSxax8beORWHZp3+BRcLAaLmNDa2UjZ0IAPJ
+# i8ckxOugDYSurddps+yXtZx8ZvenkKtVTNEbOHq/QJeP8uaw1OTMvkU54ztjqB3C
+# av19yiWU+7yQm5GlFbmbuZf4aDVzptYz+P1s7OAi3wPwNDRcHiyRdXDIYBadjJsd
+# 2Fpf+dixZfJtlQ5vyNYTcpHtCjdsAkMCDeBdcook9yiUvvupGACVnUBG/tAr8hXX
+# hMHp37r6diplAg3jRTKGmUDt8YkwpqVsttEGrHESJv3c41NCycKU/Tz+p+GWWg3A
+# virGlKhlL8YhlTcE+vUluDFF5//djT5T+Akpt/L28UYu5g==
 # SIG # End signature block
